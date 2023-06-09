@@ -1,6 +1,6 @@
 import '../../model/product_data.dart';
 
-List<Product> dummyProducts = [
+List<Product> do_not_contain = [
   Product(
     name: 'Product 4',
     brand: 'Brand 4',
