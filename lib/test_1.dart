@@ -1,4 +1,3 @@
-import 'dart:typed_data';
 import 'dart:ui' as ui;
 
 import 'package:flutter/material.dart';
@@ -7,17 +6,10 @@ import 'package:geolocator/geolocator.dart' as geolocator;
 import 'package:permission_handler/permission_handler.dart';
 import 'package:flutter/services.dart';
 
-import 'model/supermarket.dart';
+import 'model/supermarket_data.dart';
+import 'dummy_data/supermarket_list.dart';
 
 void main() => runApp(const MyApp());
-
-List<Supermarket> supermarkets = [
-  Supermarket(
-      name: 'Broaster chicken', locationX: 31.969790, locationY: 35.194734),
-  Supermarket(
-      name: 'Alto kitchens', locationX: 31.970856, locationY: 35.193350),
-  // Add more supermarkets as needed
-];
 
 class MyApp extends StatelessWidget {
   const MyApp({Key? key}) : super(key: key);
@@ -42,9 +34,82 @@ class GoogleMapPage extends StatefulWidget {
 }
 
 class _GoogleMapPageState extends State<GoogleMapPage> {
+  bool _isBottomSheetOpen = false;
+  void _openBottomSheet(Supermarket_data supermarket) {
+    setState(() {
+      _isBottomSheetOpen = true;
+    });
+
+    showModalBottomSheet<void>(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (BuildContext context) {
+        return DraggableScrollableSheet(
+          initialChildSize:
+              0.3, // Initial height of the sheet (0.3 means 30% of the screen)
+          maxChildSize:
+              1.0, // Maximum height of the sheet (1.0 means full screen)
+          minChildSize:
+              0.1, // Minimum height of the sheet (0.1 means 10% of the screen)
+          expand: false,
+          builder: (BuildContext context, ScrollController scrollController) {
+            return Container(
+              decoration: const BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.vertical(top: Radius.circular(16.0)),
+              ),
+              child: SingleChildScrollView(
+                controller: scrollController,
+                child: Padding(
+                  padding: EdgeInsets.all(16.0),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        supermarket.name,
+                        style: const TextStyle(
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      const SizedBox(height: 8),
+                      Text(
+                        'Location: ${supermarket.locationX}, ${supermarket.locationY}',
+                        style: const TextStyle(fontSize: 16),
+                      ),
+                      const SizedBox(height: 8),
+                      Text(
+                        'Contain Percentage: ${supermarket.containPercentage}%',
+                        style: TextStyle(fontSize: 16),
+                      ),
+                      SizedBox(height: 8),
+                      Text(
+                        'Original Items Size: ${supermarket.originalItemsSize}',
+                        style: TextStyle(fontSize: 16),
+                      ),
+                      SizedBox(height: 8),
+                      Text(
+                        'Containing Size: ${supermarket.containingSize}',
+                        style: TextStyle(fontSize: 16),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            );
+          },
+        );
+      },
+    ).whenComplete(() {
+      setState(() {
+        _isBottomSheetOpen = false;
+      });
+    });
+  }
+
   late GoogleMapController _mapController;
   final LatLng _initialPosition = const LatLng(31.9753133, 35.1960417);
-
   Set<Marker> _createMarkers() {
     Set<Marker> markers = {};
 
@@ -60,7 +125,8 @@ class _GoogleMapPageState extends State<GoogleMapPage> {
         ),
         icon: myIcon, // Set default marker icon
         onTap: () {
-          _onMarkerTapped(MarkerId(supermarket.name));
+          _openBottomSheet(supermarket);
+          ;
         },
       );
 
@@ -129,31 +195,6 @@ class _GoogleMapPageState extends State<GoogleMapPage> {
       });
     });
     super.initState();
-  }
-
-  void _onMarkerTapped(MarkerId markerId) {
-    // Find the supermarket corresponding to the tapped marker
-    Supermarket tappedSupermarket = supermarkets.firstWhere(
-      (supermarket) => supermarket.name == markerId.value,
-    );
-
-    // Show the details of the tapped marker (you can customize this as per your requirement)
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: Text(tappedSupermarket.name),
-        content: Text(
-            'Location: ${tappedSupermarket.locationX}, ${tappedSupermarket.locationY}'),
-        actions: [
-          TextButton(
-            onPressed: () {
-              Navigator.of(context).pop(); // Close the dialog
-            },
-            child: Text('Close'),
-          ),
-        ],
-      ),
-    );
   }
 
   @override
