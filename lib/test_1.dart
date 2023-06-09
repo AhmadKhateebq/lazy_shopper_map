@@ -58,8 +58,10 @@ class _GoogleMapPageState extends State<GoogleMapPage> {
         infoWindow: InfoWindow(
           title: supermarket.name,
         ),
-        icon: BitmapDescriptor.defaultMarkerWithHue(
-            BitmapDescriptor.hueBlue), // Set default marker icon
+        icon: myIcon, // Set default marker icon
+        onTap: () {
+          _onMarkerTapped(MarkerId(supermarket.name));
+        },
       );
 
       markers.add(marker);
@@ -116,7 +118,8 @@ class _GoogleMapPageState extends State<GoogleMapPage> {
     super.dispose();
   }
 
-  BitmapDescriptor? myIcon;
+  BitmapDescriptor myIcon =
+      BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueCyan);
 
   @override
   void initState() {
@@ -126,6 +129,31 @@ class _GoogleMapPageState extends State<GoogleMapPage> {
       });
     });
     super.initState();
+  }
+
+  void _onMarkerTapped(MarkerId markerId) {
+    // Find the supermarket corresponding to the tapped marker
+    Supermarket tappedSupermarket = supermarkets.firstWhere(
+      (supermarket) => supermarket.name == markerId.value,
+    );
+
+    // Show the details of the tapped marker (you can customize this as per your requirement)
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text(tappedSupermarket.name),
+        content: Text(
+            'Location: ${tappedSupermarket.locationX}, ${tappedSupermarket.locationY}'),
+        actions: [
+          TextButton(
+            onPressed: () {
+              Navigator.of(context).pop(); // Close the dialog
+            },
+            child: Text('Close'),
+          ),
+        ],
+      ),
+    );
   }
 
   @override
