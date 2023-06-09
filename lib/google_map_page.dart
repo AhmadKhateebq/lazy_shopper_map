@@ -6,6 +6,8 @@ import 'package:geolocator/geolocator.dart' as geolocator;
 import 'package:permission_handler/permission_handler.dart';
 import 'package:flutter/services.dart';
 
+import 'dummy_data/not_contain_product.dart';
+import 'model/product_data.dart';
 import 'model/supermarket_data.dart';
 import 'dummy_data/supermarket_list.dart';
 
@@ -24,6 +26,32 @@ class MyApp extends StatelessWidget {
       home: const GoogleMapPage(),
     );
   }
+}
+
+List<Widget> _buildDoNotContainList() {
+  List<Product> doNotContainProducts = doNotContain;
+
+  return [
+    const SizedBox(height: 16),
+    Text(
+      'Do Not Contain:',
+      style: const TextStyle(
+        fontSize: 18,
+        fontWeight: FontWeight.bold,
+      ),
+    ),
+    const SizedBox(height: 8),
+    SingleChildScrollView(
+      child: Column(
+        children: doNotContainProducts.map((product) {
+          return ListTile(
+            title: Text(product.name),
+            subtitle: Text(product.description),
+          );
+        }).toList(),
+      ),
+    ),
+  ];
 }
 
 class GoogleMapPage extends StatefulWidget {
@@ -49,7 +77,7 @@ class _GoogleMapPageState extends State<GoogleMapPage> {
           initialChildSize:
               0.3, // Initial height of the sheet (0.3 means 30% of the screen)
           maxChildSize:
-              1.0, // Maximum height of the sheet (1.0 means full screen)
+              0.8, // Maximum height of the sheet (1.0 means full screen)
           minChildSize:
               0.1, // Minimum height of the sheet (0.1 means 10% of the screen)
           expand: false,
@@ -93,6 +121,7 @@ class _GoogleMapPageState extends State<GoogleMapPage> {
                         'Containing Size: ${supermarket.containingSize}',
                         style: TextStyle(fontSize: 16),
                       ),
+                      ..._buildDoNotContainList(),
                     ],
                   ),
                 ),
