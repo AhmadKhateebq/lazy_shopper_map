@@ -29,7 +29,7 @@ class MyApp extends StatelessWidget {
 }
 
 List<Widget> _buildDoNotContainList() {
-  List<Product> doNotContainProducts = do_not_contain;
+  List<Product> doNotContainProducts = doNotContain;
 
   return [
     const SizedBox(height: 16),
@@ -77,7 +77,7 @@ class _GoogleMapPageState extends State<GoogleMapPage> {
           initialChildSize:
               0.3, // Initial height of the sheet (0.3 means 30% of the screen)
           maxChildSize:
-              1.0, // Maximum height of the sheet (1.0 means full screen)
+              0.8, // Maximum height of the sheet (1.0 means full screen)
           minChildSize:
               0.1, // Minimum height of the sheet (0.1 means 10% of the screen)
           expand: false,
